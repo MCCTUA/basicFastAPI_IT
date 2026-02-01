@@ -1,0 +1,18 @@
+[project]
+name = "fastapi-db"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "alembic>=1.18.3",
+    "asyncpg>=0.31.0",
+    "cryptography>=46.0.4",
+    "fastapi>=0.128.0",
+    "greenlet>=3.3.1",
+    "pydantic-settings>=2.12.0",
+    "pydantic[email]>=2.12.5",
+    "scalar-fastapi>=1.6.1",
+    "sqlalchemy>=2.0.46",
+    "uvicorn>=0.40.0",
+]
