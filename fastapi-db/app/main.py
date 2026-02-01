@@ -3,17 +3,18 @@ from fastapi import FastAPI
 # นำเข้า BaseModel จาก Pydantic เพื่อใช้ในการสร้างโมเดลข้อมูล
 from pydantic import BaseModel
 
+# นำเข้า api_router ที่เราสร้างไว้ใน api/v1/api.py
+from app.api.v1.api import api_router
+
 # นำเข้า get_scalar_api_reference จาก scalar_fastapi  ช่วยในการสร้างเอกสาร API
 from scalar_fastapi import get_scalar_api_reference
 
 # Create an instance of the FastAPI application
-app = FastAPI()
+app = FastAPI(title="My FastAPI App")
 
 
-# สร้างเส้นทาง (route) สำหรับ root endpoint
-@app.get("/")
-def read_root():
-    return {"message": "Hello FastAPI with uv!"}
+# นำ Router ทั้งหมดมาแปะที่ /api/v1
+app.include_router(api_router, prefix="/api/v1")
 
 
 # สร้างเส้นทางสำหรับดึงเอกสาร API reference (scalar API reference)
