@@ -19,6 +19,7 @@ SessionLocal = async_sessionmaker(
 # 3. Dependency สำหรับใช้ใน API Endpoint (Dependency Injection)
 # ใช้ yield เพื่อสร้าง session และปิด session อัตโนมัติเมื่อเสร็จงาน ทำให้ไม่ต้องปิด session เอง และช่วยจัดการ connection pool ได้ดีขึ้น
 # get_db จะถูกใช้ใน endpoint เพื่อรับ session
+# async with จะทำให้ session ถูกปิดอัตโนมัติเมื่อออกจากบล็อก
 async def get_db():
     async with SessionLocal() as session:
         yield session

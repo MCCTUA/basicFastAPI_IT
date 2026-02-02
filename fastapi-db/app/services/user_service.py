@@ -2,6 +2,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from app.models.user import User
 from app.schemas.user import UserCreate, UserUpdate
+from app.core.security import get_password_hash, verify_password
+
 
 # สมมติว่ามีฟังก์ชัน hash password ใน core/security.py
 # from app.core.security import get_password_hash
@@ -30,10 +32,10 @@ async def get_users(db: AsyncSession, skip: int = 0, limit: int = 100):
 
 # ฟังก์ชันสร้างผู้ใช้ใหม่
 async def create_user(db: AsyncSession, user: UserCreate):
-    fake_hashed_password = user.password + "notreallyhashed"
+    hashed_password = get_password_hash(user.password)
     db_user = User(
         email=user.email,
-        hashed_password=fake_hashed_password,
+        hashed_password=hashed_password,
         first_name=user.first_name,
         last_name=user.last_name,
     )
@@ -43,7 +45,13 @@ async def create_user(db: AsyncSession, user: UserCreate):
     return db_user
 
 
-# เพิ่มฟังก์ชันอื่นๆ ตามต้องการ (update, delete)
+async def authenticate_user(db: AsyncSession, email: str, password: str):
+    user = await get_user_by_email(db, email)
+    if not user:
+        return None
+    if not verify_password(password, user.hashed_password):
+        return None
+    return user
 
 
 # ฟังก์ชันอัพเดตข้อมูลผู้ใช้
