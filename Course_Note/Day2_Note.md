@@ -7,6 +7,7 @@
 ### Python FastAPI with PostgreSQL and ORM with SQLAlchemy
 
 ### Technology Stack
+
 - Python 3.10+
 - UV
 - FastAPI
@@ -18,6 +19,7 @@
 - Uvicorn (ASGI server)
 
 ### System Requirements
+
 - Python 3.10 or higher
 - PostgreSQL database server
 - uv
@@ -29,6 +31,7 @@
 - Uvicorn
 
 ### Step 1: สร้างฐานข้อมูล PostgreSQL
+
 1. ติดตั้ง PostgreSQL บนเครื่องของคุณ
 2. สร้างฐานข้อมูลใหม่สำหรับโปรเจค FastAPI ของคุณ
    ```sql
@@ -41,21 +44,24 @@
    ```
 
 ### Step 2: สร้างโปรเจ็กต์ FastAPI ด้วย UV
+
 1. คำสั่งสร้างโปรเจ็กต์ FastAPI
+
    ```bash
    uv init --python 3.13 fastapi-db
    ```
 
 2. เข้าไปในโฟลเดอร์โปรเจ็กต์
+
    ```bash
    cd fastapi-db
    ```
 
 3. ติดตั้งไลบรารีที่จำเป็น
-   ```bash
-   uv add fastapi uvicorn sqlalchemy asyncpg alembic pydantic pydantic[email] pydantic-settings cryptography scalar-fastapi
+   ````bash
+   uv add fastapi uvicorn sqlalchemy asyncpg alembic "pydantic[email]" pydantic-settings cryptography scalar-fastapi greenlet
     ```
-อธิบายแพ็กเกจที่ติดตั้ง:
+   อธิบายแพ็กเกจที่ติดตั้ง:
     - `fastapi`: Framework สำหรับสร้าง API
     - `uvicorn`: ASGI server สำหรับรันแอปพลิเคชัน FastAPI
     - `sqlalchemy`: ORM สำหรับจัดการฐานข้อมูล
@@ -66,10 +72,13 @@
     - `pydantic-settings`: ส่วนขยายของ Pydantic สำหรับการจัดการการตั้งค่า อ่านค่าจาก environment variables
     - `cryptography`: ไลบรารีสำหรับการเข้ารหัสข้อมูล
     - `scalar-fastapi`: เครื่องมือเสริมสำหรับ FastAPI
-
+    - `greenlet`: สำหรับการจัดการ context switching ใน async programming
+   ````
 
 ### Step 3: สร้างโครงสร้างโปรเจ็กต์
+
 สร้างโฟลเดอร์และไฟล์ต่าง ๆ สำหรับโปรเจ็กต์ของคุณ
+
 ```plaintext
 fastapi-db/
 ├── alembic/                    # โฟลเดอร์ที่ Auto Generate มาจาก Alembic
@@ -115,7 +124,9 @@ fastapi-db/
 ```
 
 ### Step 4: ทดสอบ การรันแอปพลิเคชัน FastAPI และ Scalar API Documentation
+
 #### 4.1 สร้างไฟล์ `app/main.py`
+
 ```python
 # นำเข้า FastAPI จากไลบรารี fastapi
 from fastapi import FastAPI
@@ -145,17 +156,22 @@ async def scalar_html():
 ```
 
 #### 4.2 รันแอปพลิเคชัน FastAPI
+
 ใช้คำสั่งต่อไปนี้เพื่อรันแอปพลิเคชัน FastAPI
+
 ```bash
 uv run uvicorn app.main:app --reload
 ```
 
 #### 4.3 ทดสอบ API
+
 - เปิดเบราว์เซอร์และไปที่ `http://localhost:8000/` เพื่อดูข้อความต้อนรับ
 - ไปที่ `http://localhost:8000/scalar` เพื่อดู Scalar API Documentation
 
 ### Step 5: ตั้งค่า Database Connection
+
 #### 5.1 สร้างไฟล์ `.env` สำหรับเก็บค่าการตั้งค่าฐานข้อมูล ไว้ในโฟลเดอร์ root (นอกสุด) ของโปรเจ็กต์
+
 ```.env
 # .env
 DATABASE_URL=postgresql+asyncpg://postgres:password@localhost:5432/fastapi_db
@@ -163,15 +179,16 @@ PROJECT_NAME=My FastAPI Project
 ```
 
 #### 5.2 สร้างไฟล์ `app/core/config.py` สำหรับโหลดค่าการตั้งค่า
+
 ```python
 from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     # กำหนด Default ได้เฉพาะข้อมูลที่ไม่ใช่ความลับ
     PROJECT_NAME: str = "My FastAPI Project"
-    
+
     # Pydantic จะบังคับให้ไปหาค่านี้จากไฟล์ .env เท่านั้น ถ้าหาไม่เจอโปรแกรมจะ Error
-    DATABASE_URL: str 
+    DATABASE_URL: str
 
     class Config:
         env_file = ".env"
@@ -181,7 +198,9 @@ settings = Settings()
 ```
 
 ### Step 6: สร้างไฟล์ Engine และ Session สำหรับเชื่อมต่อฐานข้อมูล
+
 #### 6.1 สร้างไฟล์ `app/db/session.py`
+
 ```python
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from app.core.config import settings
@@ -199,7 +218,9 @@ async def get_db():
 ```
 
 ### Step 7: สร้าง Base Model สำหรับ ORM (พระเอกของ SQLAlchemy)
+
 #### 7.1 สร้างไฟล์ `app/models/base_class.py`
+
 ```python
 from sqlalchemy.orm import DeclarativeBase
 
@@ -210,7 +231,9 @@ class Base(DeclarativeBase):
 ```
 
 ### Step 8: สร้าง Model ตัวอย่าง User และ Item
+
 #### 8.1 สร้างไฟล์ `app/models/user.py`
+
 ```python
 from sqlalchemy import Column, Integer, String, Boolean
 from sqlalchemy.orm import relationship
@@ -235,7 +258,9 @@ class User(Base):
     # cascade="all, delete-orphan" หมายความว่า ถ้า User ถูกลบ Items ที่เกี่ยวข้องจะถูกลบด้วย
     items = relationship("Item", back_populates="owner", cascade="all, delete-orphan")
 ```
+
 #### 8.2 สร้างไฟล์ `app/models/item.py`
+
 ```python
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
@@ -247,7 +272,7 @@ class Item(Base):
     id = Column(Integer, primary_key=True, index=True) # รหัสสินค้า
     title = Column(String(255), index=True) # ชื่อสินค้า
     description = Column(String, nullable=True) # คำอธิบายสินค้า
-    
+
     # ForeignKey: ผูกกับตาราง users คอลัมน์ id
     owner_id = Column(Integer, ForeignKey("users.id"))
 
@@ -257,7 +282,9 @@ class Item(Base):
 ```
 
 ### Step 9: ตัรวม Model ให้ Alembic มองเห็น
+
 #### 9.1 สร้างไฟล์ `app/db/base.py`
+
 ```python
 # Import Base มาก่อน
 from app.models.base_class import Base
@@ -271,12 +298,17 @@ from app.models.item import Item
 ```
 
 ### Step 10: การตั้งค่า Alembic (Migration)
-#### 10.1 เริ่มต้น Alembic (แบบ Async)
+
+```bash
+source .venv/bin/activate
+```
+
 ```bash
 alembic init -t async alembic
 ```
 
 #### 10.2 แก้ไขไฟล์ `alembic/env.py` เพื่อเชื่อมต่อกับฐานข้อมูลและ Model ของเรา
+
 ```python
 
 from alembic import context
@@ -301,19 +333,106 @@ target_metadata = Base.metadata  # เพื่อให้มันเทีย
 ```
 
 ### Step 11: สร้าง Migration Script และอัพเดตฐานข้อมูล
+
 #### 11.1 สร้าง Migration File (Revision): คำสั่งนี้จะไปอ่านไฟล์ Python เทียบกับ Database แล้วสร้างไฟล์ script สำหรับสร้างตาราง
+
 ```bash
 alembic revision --autogenerate -m "Init users and items tables"
 ```
+
 > ถ้าสำเร็จ: จะมีไฟล์ใหม่โผล่มาในโฟลเดอร์ alembic/versions/xxxx_init...py ลองเปิดดูจะเห็นคำสั่ง create_table
 
-#### 11.2 อัปเดต Database (Upgrade): คำสั่งนี้จะรันไฟล์ script เพื่อสร้างตารางใน Database จริง
+> แต่ถ้ามีปัญหา ให้ทำการตรวจสอบแก้ไขดังนี้
+> 📝 บันทึกการแก้ปัญหา (Troubleshooting Log)
+> Project: FastAPI + SQLAlchemy (Async) + Alembic
+
+### 1. ปัญหา ModuleNotFoundError (หาโฟลเดอร์ app ไม่เจอ)
+
+#### อาการ:
+
+รัน alembic แล้วขึ้น ModuleNotFoundError: No module named 'app'
+
+#### สาเหตุ:
+
+Root Directory ของโปรเจกต์ไม่ได้ถูกเพิ่มเข้าไปใน Python Path ทำให้ Alembic มองไม่เห็น Package app
+
+#### แนวทางแก้ไข:
+
 ```bash
-alembic upgrade head
+วิธีชั่วคราว: รันคำสั่ง export PYTHONPATH=$PYTHONPATH:$(pwd) ใน Terminal ก่อนเริ่มงาน
+
+วิธีถาวร: เพิ่มโค้ดจัดการ Path ใน alembic/env.py:
 ```
+
+```python
+Python
+import sys
+from os.path import abspath, dirname
+sys.path.insert(0, abspath(dirname(dirname(**file**)))) 2. ปัญหา Autogenerate ว่างเปล่า (Alembic สแกนไม่พบ Model)
+อาการ: สร้าง Revision สำเร็จ แต่ในไฟล์ไม่มีคำสั่งสร้างตาราง (upgrade เป็นค่าว่าง)
+```
+
+#### สาเหตุ:
+
+1. ขาดไฟล์ **init**.py ทำให้ Python ไม่นับโฟลเดอร์นั้นเป็น Package 2. ไม่ได้ Import Model มารวมกันที่ไฟล์ base.py
+
+#### แนวทางแก้ไข:
+
+```bash
+สร้างไฟล์ **init**.py (ไฟล์ว่าง) ไว้ใน: app/, app/db/, app/models/, app/core/
+
+ใน app/db/base.py ต้อง Import Model ทุกตัวเข้ามา:
+```
+
+```Python
+from app.models.base_class import Base
+from app.models.user import User
+from app.models.item import Item 3. ปัญหา ValueError: greenlet library is required
+อาการ: ValueError: the greenlet library is required to use this function.
+```
+
+#### สาเหตุ: การใช้งาน SQLAlchemy แบบ Async (ผ่าน asyncpg) จำเป็นต้องใช้ Library greenlet ในการจัดการลำดับการทำงานเบื้องหลัง
+
+#### แนวทางแก้ไข:
+
+```bash
+ติดตั้ง Library เพิ่ม: uv add greenlet หรือ pip install greenlet
+```
+
+### 4. ปัญหา IndentationError จาก Code Runner (VS Code)
+
+### อาการ:
+
+IndentationError: expected an indented block ทั้งที่โค้ดดูปกติ
+
+#### สาเหตุ: การ "คลุมดำ" (Highlight) โค้ดบางส่วนแล้วกดรัน ทำให้ Code Runner ส่งโค้ดไปรันไม่ครบถ้วน
+
+#### แนวทางแก้ไข:
+
+คลิกที่ว่างในไฟล์เพื่อยกเลิกการคลุมดำก่อนรัน หรือรันผ่าน Terminal โดยตรงด้วยคำสั่ง python <ชื่อไฟล์>.py
+
+### ✅ สรุป Workflow ที่ถูกต้อง
+
+เช็ค Database: ตรวจสอบว่า Docker/Postgres รันอยู่และ .env ตั้งค่า URL ถูกต้อง
+
+```bash
+ตั้งค่า Path: export PYTHONPATH=$PYTHONPATH:$(pwd)
+
+สร้าง Migration: alembic revision --autogenerate -m "description"
+
+อัปเดตตาราง: alembic upgrade head
+```
+
+#### 11.2 อัปเดต Database (Upgrade): คำสั่งนี้จะรันไฟล์ script เพื่อสร้างตารางใน Database จริง
+
+```bash
+uv run alembic upgrade head
+```
+
 > ตรวจสอบ Database: ลองใช้โปรแกรมเปิด Database ดู (เช่น DBeaver หรือ pgAdmin) จะเห็นตาราง users และ items ถูกสร้างขึ้นมาเรียบร้อยแล้ว
 
 ### Troubleshooting
+
 หากคุณต้องการเริ่มต้นระบบ Migration ใหม่ทั้งหมด (Reset Migration) เพื่อให้เหมือนกับเพิ่งเริ่มโปรเจ็กต์ สามารถทำตามขั้นตอนที่ผมเพิ่งทำให้ได้เลย
 
 1. ล้างข้อมูลใน Database (Downgrade): สั่งให้ Alembic ย้อนกลับการเปลี่ยนแปลงทั้งหมดเพื่อลบตารางเก่าออก
@@ -321,16 +440,18 @@ alembic upgrade head
    alembic downgrade base
    ```
 2. ลบไฟล์ Migration เก่า: ลบไฟล์ `.py` ในโฟลเดอร์ `versions` ทิ้งให้หมด
-    ```
-    # Windows PowerShell
-    Remove-Item alembic\versions\*.py
 
-    # CMD
-    del alembic\versions\*.py
+   ```
+   # Windows PowerShell
+   Remove-Item alembic\versions\*.py
 
-    # Linux / macOS
-    rm -rf alembic/versions/*.py
-    ```
+   # CMD
+   del alembic\versions\*.py
+
+   # Linux / macOS
+   rm -rf alembic/versions/*.py
+   ```
+
 3. สร้างไฟล์ Migration ใหม่: สั่งให้ Alembic สร้างไฟล์ Migration ใหม่ตามโครงสร้างปัจจุบันของโมเดล
    ```bash
    alembic revision --autogenerate -m "Init users and items tables"
@@ -338,11 +459,14 @@ alembic upgrade head
 4. อัปเดต Database ใหม่: สั่งให้ Alembic รันไฟล์ Migration ใหม่เพื่อสร้างตาราง
    ```bash
     alembic upgrade head
-    ```
+   ```
 
 ### Step 12: สร้าง CRUD Operations สำหรับ User และ Item
+
 #### 12.1 Schemas (Pydantic Models) สำหรับ User และ Item
+
 ##### 12.1.1 สร้างไฟล์ `app/schemas/user.py`
+
 ```python
 from typing import Optional
 from pydantic import BaseModel, EmailStr
@@ -372,6 +496,7 @@ class User(UserBase):
 ```
 
 ##### 12.1.2 สร้างไฟล์ `app/schemas/item.py`
+
 ```python
 from typing import Optional
 from pydantic import BaseModel
@@ -395,8 +520,11 @@ class Item(ItemBase):
 ```
 
 ### Step 13: สร้าง Service (Business Logic) Layer สำหรับ User และ Item
+
 ส่วนนี้จะคุยกับ Database ผ่าน SQLAlchemy Session ตัด Logic ออกจาก Router
+
 #### 13.1 สร้างไฟล์ `app/services/user_service.py`
+
 ```python
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -431,8 +559,8 @@ async def get_users(db: AsyncSession, skip: int = 0, limit: int = 100):
 async def create_user(db: AsyncSession, user: UserCreate):
     fake_hashed_password = user.password + "notreallyhashed"
     db_user = User(
-        email=user.email, 
-        hashed_password=fake_hashed_password, 
+        email=user.email,
+        hashed_password=fake_hashed_password,
         first_name=user.first_name,
         last_name=user.last_name
     )
@@ -444,6 +572,7 @@ async def create_user(db: AsyncSession, user: UserCreate):
 ```
 
 #### 13.2 สร้างไฟล์ `app/services/item_service.py`
+
 ```python
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -473,9 +602,12 @@ async def create_user_item(db: AsyncSession, item: ItemCreate, user_id: int):
 ```
 
 ### Step 14: สร้าง API Endpoints สำหรับ User และ Item
+
 ส่วนรับ Request จาก Client และเรียกใช้ Service
 Utility: สร้าง Dependency สำหรับรับ DB Session (อยู่ใน app/api/deps.py)
+
 #### 14.1 สร้างไฟล์ `app/api/deps.py`
+
 ```python
 from typing import AsyncGenerator
 from app.db.session import SessionLocal
@@ -490,7 +622,9 @@ async def get_db() -> AsyncGenerator:
             # หรือถ้าไม่ได้ใช้ context manager ต้อง await db.close() เอง
             pass
 ```
+
 #### 14.2 แก้ไขไฟล์ `app/api/v1/endpoints/users.py` เพื่อใช้ AsyncSession และ await
+
 ```python
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException
@@ -537,7 +671,9 @@ async def read_user(user_id: int, db: AsyncSession = Depends(deps.get_db)):  # �
         raise HTTPException(status_code=404, detail="User not found")
     return db_user
 ```
+
 #### 14.3 แก้ไขไฟล์ `app/api/v1/endpoints/items.py` เพื่อใช้ AsyncSession และ await
+
 ```python
 from typing import List
 from fastapi import APIRouter, Depends
@@ -571,8 +707,10 @@ async def create_item_for_user(
 ```
 
 ### Step 15: Wiring (รวม Router)
+
 ขั้นตอนสุดท้ายคือรวมทุก Endpoints เข้าด้วยกันที่ api.py
 **ไฟล์:** `app/api/v1/api.py`
+
 ```python
 from fastapi import APIRouter
 from app.api.v1.endpoints import users, items
@@ -588,6 +726,7 @@ api_router.include_router(items.router, prefix="/items", tags=["items"])
 ```
 
 **ไฟล์:** app/main.py
+
 ```python
 # นำเข้า FastAPI จากไลบรารี fastapi
 from fastapi import FastAPI
@@ -618,12 +757,15 @@ async def scalar_html():
 ```
 
 ### Step 16: ทดสอบ API Endpoints
+
 รันแอปพลิเคชัน FastAPI
+
 ```bash
 uv run uvicorn app.main:app --reload
 ```
 
 ทดสอบ API Endpoints ผ่านทางเบราว์เซอร์หรือ Postman
+
 - ดูเอกสาร API ที่ `http://localhost:8000/scalar`
 - ทดสอบ User Endpoints ที่ `http://localhost:8000/api/v1/users`
 - ทดสอบ Item Endpoints ที่ `http://localhost:8000/api/v1/items`

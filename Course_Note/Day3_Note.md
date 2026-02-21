@@ -7,6 +7,7 @@
 ### Python FastAPI with PostgreSQL and ORM with SQLAlchemy
 
 ### Technology Stack
+
 - Python 3.10+
 - UV
 - FastAPI
@@ -18,6 +19,7 @@
 - Uvicorn (ASGI server)
 
 ### System Requirements
+
 - Python 3.10 or higher
 - PostgreSQL database server
 - uv
@@ -77,10 +79,13 @@ fastapi-db/
 ### FastAPI Authentication and Authorization with JWT
 
 ### Step 1: Install Required Packages
+
 ```bash
-uv add greenlet python-jose[cryptography] bcrypt python-multipart slowapi
+uv add greenlet "python-jose[cryptography]" bcrypt python-multipart slowapi
 ```
+
 อธิบาย:
+
 - `greenlet`: สำหรับการจัดการ context switching ใน async programming
 - `python-jose[cryptography]`: สำหรับการสร้างและตรวจสอบ JWT tokens
 - `bcrypt`: สำหรับการแฮชรหัสผ่าน
@@ -88,6 +93,7 @@ uv add greenlet python-jose[cryptography] bcrypt python-multipart slowapi
 - `slowapi`: สำหรับการจำกัดอัตราการเข้าถึง (rate limiting)
 
 ### Step 2: แก้ไขไฟล์ .env เพื่อเพิ่มการตั้งค่า JWT
+
 ```env
 DATABASE_URL=postgresql+asyncpg://postgres:your_password@localhost:5432/fastapi_db
 PROJECT_NAME=My FastAPI Project
@@ -98,18 +104,22 @@ ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=30
 REFRESH_TOKEN_EXPIRE_DAYS=7
 ```
+
 Generate a strong secret key using node:
+
 ```bash
 node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
 
 อธิบาย:
+
 - `SECRET_KEY`: คีย์ลับที่ใช้ในการเซ็น JWT tokens ควรเป็นคีย์ที่ยาวและซับซ้อน
 - `ALGORITHM`: อัลกอริทึมที่ใช้ในการเซ็น JWT tokens (เช่น HS256)
 - `ACCESS_TOKEN_EXPIRE_MINUTES`: เวลาหมดอายุของ Access Token (หน่วย: นาที)
 - `REFRESH_TOKEN_EXPIRE_DAYS`: เวลาหมดอายุของ Refresh Token (หน่วย: วัน)
 
 ### Step 3: แก้ไขไฟล์ app/core/config.py เพื่อโหลดการตั้งค่า JWT
+
 ```python
 from pydantic_settings import BaseSettings
 
@@ -137,9 +147,11 @@ settings = Settings()
 ```
 
 อธิบาย:
+
 - เพิ่มการตั้งค่า JWT ในคลาส `Settings` เพื่อให้สามารถเข้าถึงค่าเหล่านี้ได้ทั่วโปรเจ็กต์ผ่าน `settings`
 
 ### Step 4: สร้างยูทิลิตี้สำหรับการจัดการ JWT tokens ในไฟล์ app/core/security.py
+
 ```python
 from datetime import datetime, timedelta
 from typing import Any, Union
@@ -195,13 +207,14 @@ def get_password_hash(password: str) -> str:
 ```
 
 อธิบาย:
+
 - `create_access_token`: สร้าง JWT Access Token โดยมีข้อมูล subject และเวลาหมดอายุ
 - `create_refresh_token`: สร้าง JWT Refresh Token โดยมีข้อมูล subject และเวลาหมดอายุ
 - `verify_password`: ตรวจสอบรหัสผ่านที่ป้อนเข้ากับรหัสผ่านที่แฮชไว้
 - `get_password_hash`: แฮชรหัสผ่านโดยใช้ bcrypt
 
-
 ### Step 5: เพิ่มไฟล์ app/schemas/token.py สำหรับ Token Schema
+
 ```python
 from typing import Optional
 from pydantic import BaseModel
@@ -219,6 +232,7 @@ class TokenPayload(BaseModel):
 ```
 
 ### Step 6: แก้ไขไฟล์ app/services/user_service.py เพื่อเพิ่มฟังก์ชันการสร้างผู้ใช้พร้อมแฮชรหัสผ่าน
+
 ```python
 from app.core.security import get_password_hash, verify_password
 
@@ -232,7 +246,9 @@ async def create_user(db: AsyncSession, user: UserCreate):
 async def authenticate_user(db: AsyncSession, email: str, password: str):
     if not verify_password(password, user.hashed_password):
 ```
+
 โค้ดที่สมบูรณ์:
+
 ```python
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -286,6 +302,7 @@ async def authenticate_user(db: AsyncSession, email: str, password: str):
 ```
 
 ### Step 7: สร้าง Endpoint สำหรับการ auth ในไฟล์ app/api/v1/endpoints/auth.py
+
 ```python
 from datetime import timedelta
 from typing import Any
@@ -380,6 +397,7 @@ async def logout():
 ```
 
 ### Step 8: แก้ไขไฟล์ app/api/deps.py เพื่อเพิ่ม Dependency สำหรับการเชื่อมต่อฐานข้อมูล
+
 ```python
 from typing import AsyncGenerator
 from fastapi import Depends, HTTPException, status
@@ -438,6 +456,7 @@ def get_current_active_user(
 ```
 
 ### Step 9: แก้ไขไฟล์ app/api/v1/api.py เพื่อเพิ่ม Router ของ Auth
+
 ```python
 from fastapi import APIRouter, Depends
 from app.api import deps
@@ -467,22 +486,29 @@ api_router.include_router(
 ```
 
 ### Step 10: รันแอปพลิเคชัน FastAPI
+
 ใช้คำสั่งต่อไปนี้เพื่อรันแอปพลิเคชัน FastAPI
+
 ```bash
 uv run uvicorn app.main:app --reload
 ```
 
 #### 10.1 ทดสอบ API
+
 - เปิดเบราว์เซอร์และไปที่ `http://localhost:8000/` เพื่อดูข้อความต้อนรับ
 - ไปที่ `http://localhost:8000/scalar` เพื่อดู Scalar API Documentation
 
-
 ### Step 11: ทดสอบการทำงานของ Authentication
+
 - ใช้เครื่องมือเช่น Postman หรือ curl เพื่อทดสอบการลงทะเบียนผู้ใช้, การเข้าสู่ระบบ, และการรีเฟรชโทเค็น
 - ตรวจสอบว่า Endpoints ที่ต้องการการยืนยันตัวตนสามารถเข้าถึงได้เฉพาะเมื่อมีโทเค็นที่ถูกต้องเท่านั้น
 
 ### Step 12: เพิ่ม Rate Limiting ด้วย SlowAPI
+
+`เทคนิคที่ระบบ ใช้ตรวจสอบคือ การตรวจสอบ IP Adress เพื่อระบุว่า user คนนี้ พยายามกรอก Form มาแล้วกี่ครั้ง (ไม่จำเป็นต้องเป็นหน้า login ก็ได้)`
+
 #### Step 12.1: สร้างไฟล์ app/core/limiter.py
+
 ```python
 from slowapi import Limiter
 from slowapi.util import get_remote_address
@@ -493,6 +519,7 @@ limiter = Limiter(key_func=get_remote_address)
 ```
 
 #### Step 12.2: แก้ไขไฟล์ app/api/v1/endpoints/auth.py เพื่อเพิ่ม Rate Limiting
+
 ```python
 
 from app.core.limiter import limiter
@@ -509,6 +536,7 @@ async def login_access_token(
 ```
 
 #### Step 12.3: แก้ไขไฟล์ app/main.py เพื่อเพิ่ม Middleware ของ SlowAPI
+
 ```python
 # นำเข้า FastAPI จากไลบรารี fastapi
 from fastapi import FastAPI
@@ -548,9 +576,11 @@ async def scalar_html():
 ```
 
 #### Step 12.4: ทดสอบ Rate Limiting
+
 - ใช้ Postman หรือ curl เพื่อทดสอบการเรียกใช้งาน Endpoint `/api/v1/auth/login` เกิน 5 ครั้งภายใน 1 นาที
 - คุณควรได้รับข้อความแจ้งเตือนว่ามีการเรียกใช้งานเกินอัตราที่กำหนด
 - ตัวอย่างข้อความแจ้งเตือน:
+
 ```json
 {
   "detail": "Rate limit exceeded: 5 per 1 minute"
@@ -560,6 +590,7 @@ async def scalar_html():
 ### Step 13. การเขียน Dockerfile และ docker-compose.yml สำหรับรันแอปพลิเคชัน FastAPI กับ PostgreSQL
 
 #### Step 13.1 เขียน Dockerfile
+
 ```Dockerfile
 # Use an official Python runtime as a parent image
 FROM python:3.13-slim
@@ -591,6 +622,7 @@ CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
 ```
 
 #### Step 13.2 เขียน docker-compose.yml
+
 ```yaml
 networks:
   fastapi-db-network:
@@ -603,17 +635,17 @@ services:
     container_name: fastapi-db-postgres
     restart: always
     environment:
-      POSTGRES_USER: "${POSTGRES_USER}"
-      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
-      POSTGRES_DB: "${POSTGRES_DB}"
+      POSTGRES_USER: '${POSTGRES_USER}'
+      POSTGRES_PASSWORD: '${POSTGRES_PASSWORD}'
+      POSTGRES_DB: '${POSTGRES_DB}'
     ports:
-      - "${POSTGRES_PORT}:5432"
+      - '${POSTGRES_PORT}:5432'
     volumes:
       - db_data:/var/lib/postgresql/data
     networks:
       - fastapi-db-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -623,14 +655,14 @@ services:
     container_name: fastapi-db-web
     restart: always
     ports:
-      - "8000:8000"
+      - '8000:8000'
     environment:
       # Use the service name 'db' as the hostname
-      DATABASE_URL: "postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}"
+      DATABASE_URL: 'postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}'
     depends_on:
       db:
         condition: service_healthy
-    networks: 
+    networks:
       - fastapi-db-network
     # Optional: Run migrations automatically on startup
     command: sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000"
@@ -640,7 +672,9 @@ volumes:
 ```
 
 #### Step 13.3 สร้างไฟล์ .env สำหรับ Docker Compose
+
 สร้างไฟล์ `.env` ในโฟลเดอร์เดียวกับ `docker-compose.yml`
+
 ```env
 PROJECT_NAME=My FastAPI Project
 
@@ -662,11 +696,14 @@ REFRESH_TOKEN_EXPIRE_DAYS=7
 ```
 
 #### Step 13.4 รันแอปพลิเคชันด้วย Docker Compose
+
 ใช้คำสั่งต่อไปนี้เพื่อรันแอปพลิเคชันด้วย Docker Compose
+
 ```bash
 docker compose up -d --build
 ```
 
 #### Step 13.5 ทดสอบแอปพลิเคชัน
+
 - เปิดเบราว์เซอร์และไปที่ `http://localhost:8000/` เพื่อดูข้อความต้อนรับ
 - ไปที่ `http://localhost:8000/scalar` เพื่อดู Scalar API Documentation
